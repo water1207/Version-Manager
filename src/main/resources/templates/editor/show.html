@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title th:text="${version.title}"></title>
+    <style type="text/css">
+        mark{                        /*高亮颜色*/
+            background: orange;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <!--文章主体内容-->
+    <div id="doc-content" style="width: 80%">
+        <textarea id="content" style="display:none;" placeholder="markdown" th:text="${version.content}"></textarea>
+    </div>
+    <div>
+        <input id = "vid" name = "vid"  th:value="${version.vid}" type="hidden">
+        <input id = "search" name="search" type="text"><br>
+        文件名：<input th:value="${doc.name}" type="text">
+        文件号：<input id="did" th:value="${doc.did}"><br>
+        <button id="export">导出为MarkDown</button>
+        <button id="compare">版本比较</button>
+        <button id="edit">新版本</button>
+    </div>
+</div>
+
+<link rel="stylesheet" th:href="@{/editormd/css/editormd.preview.css}" />
+<!--<script th:src="@{/editormd/lib/jquery.min.js}"></script>-->
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mark.js/7.0.0/jquery.mark.min.js"></script>
+<script th:src="@{/editormd/lib/marked.min.js}"></script>
+<script th:src="@{/editormd/lib/prettify.min.js}"></script>
+<script th:src="@{/editormd/lib/raphael.min.js}"></script>
+<script th:src="@{/editormd/lib/underscore.min.js}"></script>
+<script th:src="@{/editormd/lib/sequence-diagram.min.js}"></script>
+<script th:src="@{/editormd/lib/flowchart.min.js}"></script>
+<script th:src="@{/editormd/lib/jquery.flowchart.min.js}"></script>
+<script th:src="@{/editormd/js/editormd.min.js}"></script>
+
+<script type="text/javascript">
+    var testEditor;
+
+    $(function () {
+        testEditor = editormd.markdownToHTML("doc-content", {//注意：这里是上面DIV的id
+            htmlDecode: "style,script,iframe",
+            emoji: true,
+            taskList: true,
+            tocm: true,
+            tex: true, // 默认不解析
+            flowChart: true, // 默认不解析
+            sequenceDiagram: true, // 默认不解析
+            codeFold: true
+        });
+        //origin = $("#doc-content").html();
+        //实时监听搜索框里的关键词
+        $("input").on("input.highlight", function() {
+            // Determine specified search term
+            try {
+                var searchTerm = $(this).val();
+                // Highlight search term inside a specific context
+                $("#doc-content").unmark().mark(searchTerm);
+
+                if (searchTerm == "") {
+                    //查询结果内容在页面定位
+                    $('body,html').animate({scrollTop: $("mark:contains('" + searchTerm + "')").offset().top + "px"}, 500);
+                } else {
+                    //查询结果内容在页面定位
+                    $('body,html').animate({scrollTop: $("mark:contains('" + searchTerm + "')").offset().top - 200 + "px"}, 500);
+                }
+            }catch(e){
+
+            }
+
+        }).trigger("input.highlight").focus();
+    });
+
+    $("#export").click(function() {
+        var vid = $("#vid").val();
+        window.parent.location.href = "http://127.0.0.1:8080/export_md?vid=" + vid;
+    });
+
+    $("#compare").click(function() {
+        var vid = $("#vid").val();
+        var did = $("#did").val();
+        window.parent.location.href = "http://127.0.0.1:8080/compare?did=" + did + "&vid=" + vid;
+    });
+    $("#edit").click(function() {
+        var did = $("#did").val();
+        window.parent.location.href = "http://127.0.0.1:8080/edit?did=" + did;
+    });
+
+    // $("button").click(function(){
+    //     $("#doc-content").each(function () {
+    //         var str = origin;
+    //         alert(str);
+    //         var key = $("#search").val()
+    //         var reg=new RegExp("("+key+")","g");
+    //         var replace="<span style='color:red;font-weight:bold'>"+key+"</span>"
+    //
+    //         var replaceStr=str.replace(reg,replace)
+    //
+    //         $(this).html(replaceStr);
+    //     });
+    // });
+
+
+
+
+
+</script>
+</body>
+</html>

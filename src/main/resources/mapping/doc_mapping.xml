@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hziee.dash.mapper.DocMapper">
+    <select id="findById" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Doc">
+        select * from documents where did = #{did}
+    </select>
+    <select id="findAllByRepos" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Doc">
+        select * from documents where did in (select did from repos_doc where rid = #{rid})
+    </select>
+
+    <insert id="createDoc" parameterType="cn.edu.hziee.dash.entity.Doc" useGeneratedKeys="true" keyProperty="did" >
+        insert into documents values(#{did}, #{name}, #{time})
+    </insert>
+    <insert id="linkRepos" parameterType="java.lang.Integer">
+        insert into repos_doc values(#{rid}, #{did})
+    </insert>
+    <delete id="delDoc" parameterType="java.lang.Integer">
+        delete from documents where did = #{did}
+    </delete>
+    <update id="editTime" parameterType="java.sql.Date">
+        update document set time = #{time}
+    </update>
+    <select id="getLatestVersion" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Version">
+       select * from version where vid in (select vid from doc_version where did = #{did}) order by vid DESC LIMIT 1;
+    </select>
+    <select id="getRidByDid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select * from repos_doc where did = ${did}
+    </select>
+</mapper>

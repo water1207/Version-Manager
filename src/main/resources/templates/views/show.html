@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!--xmlns:th="http://www.w3.org/1999/xhtml"-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>主页显示</title>
+    <link rel="stylesheet" th:href="@{/main/css/doc.css}"/>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title th:text="${version.title}"></title>
+    <style type="text/css">
+        mark{                        /*高亮颜色*/
+            background: orange;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top">
+
+    <div class="top1">
+        <a class="top1-img" href="/repos_list?uid=1">🐟</a>
+<!--        <img class="top1-img" th:src="@{/main/image/dolphin.png}" alt="">-->
+        <a href="/repos_list?uid=1"><h3>语雀</h3></a>
+    </div>
+
+    <div class="top3">
+        <ul>
+            <a th:href="@{'/doc_list?rid='+${repos.rid}}"><li th:text="${repos.name}+' /'"></li></a>
+            <li th:text="${doc.name}+' /'"></li>
+            <li th:text="${version.title}"></li>
+        </ul>
+    </div>
+    <div class="top2">
+        <div class="top2-search">
+            <form action="">
+                <div class="search-text">
+                    <input id = "vid" name = "vid"  th:value="${version.vid}" type="hidden">
+                    <input id = "search" name="search" type="text" placeholder="请输入您要搜索的内容...">
+                    <input id = "did" th:value="${doc.did}" type="hidden"><br>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="top4">
+        <div class="top4-img">
+<!--            <img th:src="@{/main/image/user.jpg}" alt="">-->
+        </div>
+        <div class="top4-name"><p>admin</p></div>
+    </div>
+
+</div>
+
+<div class="container">
+    <div class="sidebar">
+<!--        <img th:src="@{/main/image/manage.png}" alt="">-->
+<!--        <p>版本管理</p>-->
+
+        <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="demo" style="margin-right: 10px;">
+            <li class="layui-nav-item"> <a href="javascript:;">版本管理</a></li>
+            <li class="layui-nav-item" th:each="v:${vs}"><a th:href="@{'/show?did='+${doc.did}+'&vid='+${v.vid}}" th:text="${v.title}"></a></li>
+        </ul>
+<!--        <ul>-->
+<!--            <li th:each="v:${vs}"><a th:href="@{'/show?did='+${doc.did}+'&vid='+${v.vid}}" th:text="${v.title}"></a></li>-->
+<!--        </ul>-->
+    </div>
+
+    <div class="content">
+        <div class="content-doc" id="doc-content" style="width: 90%;height: 85%;background-color: rgba(201, 206, 212, 0.21)" >
+            <textarea id="content" style="display:none;" placeholder="markdown" th:text="${version.content}"></textarea>
+        </div>
+    </div>
+
+</div>
+
+<div class="bottom">
+    <div class="bottom-left">
+        <img class="bottom-img" th:src="@{/main/image/dolphin.png}" alt="">
+        <h4>&nbsp;&nbsp;语雀</h4>
+    </div>
+    <div class="bottom-right">
+        <ul>
+            <li>关于语雀</li>
+            <li>使用帮助</li>
+            <li>数据安全</li>
+            <li>服务协议</li>
+            <li>&nbsp;&nbsp;&nbsp;English</li>
+        </ul>
+    </div>
+</div>
+
+<div class="export">
+    <img th:src="@{/main/image/export.png}" class="export_imag">
+</div>
+<div class="compare">
+    <a th:href="@{'/compare?did='+${doc.did}+'&vid='+${version.vid}}"><img th:src="@{/main/image/compare.png}" class="compare_imag"></a>
+</div>
+<div class="edit">
+    <button id="edit" class="layui-btn layui-btn-normal">编辑</button>
+</div>
+
+
+
+<link rel="stylesheet" th:href="@{/editormd/css/editormd.preview.css}" />
+<!--<script th:src="@{/editormd/lib/jquery.min.js}"></script>-->
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mark.js/7.0.0/jquery.mark.min.js"></script>
+<script th:src="@{/editormd/lib/marked.min.js}"></script>
+<script th:src="@{/editormd/lib/prettify.min.js}"></script>
+<script th:src="@{/editormd/lib/raphael.min.js}"></script>
+<script th:src="@{/editormd/lib/underscore.min.js}"></script>
+<script th:src="@{/editormd/lib/sequence-diagram.min.js}"></script>
+<script th:src="@{/editormd/lib/flowchart.min.js}"></script>
+<script th:src="@{/editormd/lib/jquery.flowchart.min.js}"></script>
+<script th:src="@{/editormd/js/editormd.min.js}"></script>
+<script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+
+<script type="text/javascript">
+    var testEditor;
+
+    $(function () {
+        testEditor = editormd.markdownToHTML("doc-content", {//注意：这里是上面DIV的id
+            htmlDecode: "style,script,iframe",
+            emoji: true,
+            taskList: true,
+            tocm: true,
+            tex: true, // 默认不解析
+            flowChart: true, // 默认不解析
+            sequenceDiagram: true, // 默认不解析
+            codeFold: true
+        });
+        //origin = $("#doc-content").html();
+        //实时监听搜索框里的关键词
+        $("#search").on("input.highlight", function() {
+            // Determine specified search term
+            try {
+                var searchTerm = $(this).val();
+                // Highlight search term inside a specific context
+                $("#doc-content").unmark().mark(searchTerm);
+
+                if (searchTerm == "") {
+                    //查询结果内容在页面定位
+                    $('body,html').animate({scrollTop: $("mark:contains('" + searchTerm + "')").offset().top + "px"}, 500);
+                } else {
+                    //查询结果内容在页面定位
+                    $('body,html').animate({scrollTop: $("mark:contains('" + searchTerm + "')").offset().top - 200 + "px"}, 500);
+                }
+            }catch(e){
+
+            }
+
+        }).trigger("input.highlight").focus();
+    });
+
+    $(".export").click(function() {
+        var vid = $("#vid").val();
+        window.parent.location.href = "http://127.0.0.1:8080/export_md?vid=" + vid;
+    });
+    $("#edit").click(function() {
+        var did = $("#did").val();
+        window.parent.location.href = "http://127.0.0.1:8080/edit?did=" + did;
+    });
+    layui.use('element', function(){
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+        //监听导航点击
+        element.on('nav(demo)', function(elem){
+            //console.log(elem)
+            layer.msg(elem.text());
+        });
+    });
+</script>
+</body>
+
+</html>

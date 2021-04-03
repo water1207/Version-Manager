@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选择文件夹</title>
+    <link rel="stylesheet" th:href="@{/main/css/FolderSelection.css}"/>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+<!--    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/FolderSelection.css"/>-->
+</head>
+<body>
+
+    <div class="top">
+        <ul class="layui-nav">
+            <li class="layui-nav-item">
+                <a href="/repos_list?uid=1">🐟</a>
+            </li>
+            <li class="layui-nav-item">
+              <a><cite th:text="${repos.name}"></cite></a>
+            </li>
+            <li class="layui-nav-item layui-col-md-offset7"></li>
+            <li class="layui-nav-item"></li><li class="layui-nav-item"></li><li class="layui-nav-item"></li>
+            <li class="layui-nav-item">
+                <a href="">控制台<span class="layui-badge">9</span></a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="">个人中心<span class="layui-badge-dot"></span></a>
+            </li>
+            <li class="layui-nav-item" lay-unselect="">
+                <a href="javascript:;"><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">修改信息</a></dd>
+                    <dd><a href="javascript:;">安全管理</a></dd>
+                    <dd><a href="javascript:;">退了</a></dd>
+                </dl>
+            </li>
+        </ul>
+<!--        <div class="top1">-->
+<!--            <img class="top1-img" th:src="@{/main/image/dolphin.png}" alt="">-->
+<!--            <a href="/repos_list?uid=1"><h3>语雀</h3></a>-->
+<!--        </div>-->
+
+<!--        <div class="top2">-->
+<!--            <div class="search-box">-->
+<!--                <input class="search-txt" type="text" name="" placeholder="Type to search">-->
+<!--                <a class="search-btn" href="#">-->
+<!--                    <i class="fa-search"><img th:src="@{/main/image/search.png}" alt=""></i>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="top3">-->
+<!--            <ul>-->
+<!--                <b><li>工作台</li></b>-->
+<!--                <li>小记</li>-->
+<!--                <li>空间</li>-->
+<!--                <li>发现</li>-->
+<!--                <li>帮助</li>-->
+<!--                <li>反馈</li>-->
+<!--            </ul>-->
+<!--        </div>-->
+
+<!--        <div class="top4">-->
+<!--            <div class="top4-message">-->
+<!--                <img th:src="@{/main/image/铃铛.png}" alt="">-->
+<!--            </div>-->
+<!--            <div class="top4-img">-->
+<!--                <img th:src="@{/main/image/user.jpg}" alt="">-->
+<!--            </div>-->
+<!--        </div>-->
+
+    </div>
+
+    <div class="container">
+        <div class="container-edition-add">
+<!--            <button><img th:src="@{/main/image/add.png}" alt="" id="add"></button>-->
+            <button type="button" class="layui-btn" id="add">新建文档</button>
+        </div>
+
+        <div class="container-edition-edition">
+<!--            <div class="container-edition"  th:each="d:${docs}">-->
+            <div class="container-edition">
+                <table id="t1" width="100%" class="layui-table">
+                    <thead>
+                    <tr>
+                        <th>项目名</th>
+                        <th>最近编辑</th>
+                        <th>创建人</th>
+                        <th>编辑</th>
+                        <th>删除</th>
+                    </tr>
+                    </thead>
+                    <tr th:each="d:${docs}">
+                        <td><a th:text="${d.name}" th:href="@{'/doc?did='+${d.did}}"></a></td>
+                        <td th:text="${d.showTime()}"></td>
+                        <td>admin</td>
+                        <td>编辑</td>
+                        <td>
+                            <a th:href="@{'/del_repos?rid='+${d.did}}">删除</a>
+                        </td>
+                    </tr>
+                </table>
+                <div id="demo1"></div>
+<!--                <div class="container-edition-img">-->
+<!--                    <a th:href="@{'/doc?did='+${d.did}}">-->
+<!--                        <img th:src="@{/main/image/order.png}">-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--                <div class="container-edition-text">-->
+<!--                    <p class="pp1" th:text="${d.name}"></p>-->
+<!--                    <p class="pp">最近编辑：</p>-->
+<!--                    <p th:text="${d.showTime()}"></p>-->
+<!--                    <p class="pp">创建者：admin</p>-->
+<!--                </div>-->
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom">
+        <div class="bottom-left">
+            <img class="bottom-img" th:src="@{/main/image/dolphin.png}" alt="">
+            <h4>&nbsp;&nbsp;语雀</h4>
+        </div>
+        <div class="bottom-right">
+            <ul>
+                <li>关于语雀</li>
+                <li>使用帮助</li>
+                <li>数据安全</li>
+                <li>服务协议</li>
+                <li>&nbsp;&nbsp;&nbsp;English</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="add">
+        <div class="add-name"><p>新建文档</p></div>
+        <form action="/create_doc">
+            <div class="add-file">
+                文档名：<input type="text" name="name"><br>
+            </div>
+            <input th:value="${repos.rid}" type="hidden" name="rid">
+            <div class="add-submit"><input type="submit" value="增加"></div>
+        </form>
+    </div>
+
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.js"></script>
+<script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+<script>
+
+    $('#add').click(function() {
+        $('.add').toggle('slow','linear');
+    })
+    layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+
+        //总页数低于页码总数
+        laypage.render({
+            elem: 'demo0'
+            ,count: 50 //数据总数
+        });
+
+        //总页数大于页码总数
+        laypage.render({
+            elem: 'demo1'
+            ,count: 70 //数据总数
+            ,jump: function(obj){
+                console.log(obj)
+            }
+        });
+    });
+
+
+
+</script>
+</html>

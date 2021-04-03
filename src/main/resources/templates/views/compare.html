@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>版本比对</title>
+    <link rel="stylesheet" th:href="@{/main/css/VersionComparision.css}"/>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+</head>
+<body>
+    <div class="top">
+
+        <div class="top1">
+            <a class="top1-img" href="/repos_list?uid=1">🐟</a>
+<!--            <img  th:src="@{/main/image/dolphin.png}" alt="">-->
+            <a href="/repos_list?uid=1"><h3>语雀</h3></a>
+        </div>
+
+        <div class="top3">
+            <a th:href="@{'/doc?did='+${doc.did}}"><b th:text="${doc.name}"></b></a>
+            <b>/</b>
+            <b>历史版本</b>
+            <input type="hidden" th:value="${v1.vid}" id="vid">
+            <select>
+                <option th:each="v:${vs}" th:text="${v.title}" th:value="${v.vid}"></option>
+            </select>
+
+        </div>
+
+        <div class="top2">
+            <div class="search-box">
+                <input class="search-txt" type="text" name="" placeholder="Type to search">
+                <a class="search-btn" href="#">
+                    <i class="fa-search"><img th:src="@{/main/image/search.png}" alt=""></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="top4">
+            <div class="top4-message">
+<!--                <img th:src="@{/main/image/铃铛.png}" alt="">-->
+            </div>
+            <div class="top4-img">
+<!--                <img th:src="@{/main/image/user.jpg}" alt="">-->
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container">
+        <div class="container1">
+            <b class="bb">历史版本</b>
+            <div id="version1" style="width: 94%">
+                <textarea id="v1" style="display:none;" placeholder="markdown" th:text="${v1.content}"></textarea>
+            </div>
+        </div>
+        <div class="container2">
+            <b class="bb">比对结果</b>
+            <div id="compareT" style="width: 94%"  class="markdown-body editormd-html-preview">
+                <!-- 比较结果 -->
+            </div>
+        </div>
+        <div class="container3">
+            <b class="bb">最新版本</b>
+            <div id="version2" style="width: 94%">
+                <textarea id="v2" style="display:none;" placeholder="markdown" th:text="${v2.content}"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="compare">
+        <button id="diffBtn" class="layui-btn layui-btn-normal">对比</button></b>
+    </div>
+    <input type="hidden" th:value="${did}" id="did">
+
+
+    <!--编辑器的js-->
+    <link rel="stylesheet" th:href="@{/editormd/css/editormd.preview.css}" />
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/mark.js/7.0.0/jquery.mark.min.js"></script>
+    <script th:src="@{/editormd/lib/marked.min.js}"></script>
+    <script th:src="@{/editormd/lib/prettify.min.js}"></script>
+    <script th:src="@{/editormd/lib/raphael.min.js}"></script>
+    <script th:src="@{/editormd/lib/underscore.min.js}"></script>
+    <script th:src="@{/editormd/lib/sequence-diagram.min.js}"></script>
+    <script th:src="@{/editormd/lib/flowchart.min.js}"></script>
+    <script th:src="@{/editormd/lib/jquery.flowchart.min.js}"></script>
+    <script th:src="@{/editormd/js/editormd.min.js}"></script>
+    <!--文本比较的js-->
+    <script type="text/javascript" src="js/htmldiff.js"></script>
+    <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+    <script type="text/javascript">
+        var Editor1;               /* 解析md转html显示 */
+        var Editor2;
+        $(function () {
+            Editor1 = editormd.markdownToHTML("version1", {//注意：这里是上面DIV的id
+                htmlDecode: "style,script,iframe",
+                emoji: true,
+                taskList: true,
+                tocm: true,
+                tex: true, // 默认不解析
+                flowChart: true, // 默认不解析
+                sequenceDiagram: true, // 默认不解析
+                codeFold: true
+            });
+            Editor2 = editormd.markdownToHTML("version2", {//注意：这里是上面DIV的id
+                htmlDecode: "style,script,iframe",
+                emoji: true,
+                taskList: true,
+                tocm: true,
+                tex: true, // 默认不解析
+                flowChart: true, // 默认不解析
+                sequenceDiagram: true, // 默认不解析
+                codeFold: true
+            });
+            var vid = $("#vid").val();
+            $("select").val(vid);
+        });
+
+        /* 差异比较 */
+        var diffBtn = document.getElementById("diffBtn");
+        var diff = document.getElementById('compareT');
+        diffBtn.onclick = function () {
+            diff.innerHTML = '<img style="margin-left:48%" src="http://img.t.sinajs.cn/t5/style/images/common/loading.gif">';
+            var oldT = document.getElementById('version1').innerHTML;
+            var newT = document.getElementById('version2').innerHTML;
+            // var oldT = $("#version1").html();
+            // var newT = $("#version2").html();
+            if(typeof Worker === "undefined"){
+                diff.innerHTML = getHTMLDiff(oldT, newT);
+            } else{
+                var worker = new Worker('js/htmldiff.js');
+                worker.postMessage({
+                    'newVersion': newT,
+                    'oldVersion': oldT
+                });
+                worker.onmessage = function (evt) {
+                    diff.innerHTML = evt.data;
+                };
+            }
+            var vid = $("#vid").val();
+            $("select").val(vid);
+        };
+        $("select").change(function () {
+            var vid = $("select").val();
+            var did = $("#did").val();
+            window.parent.location.href = "http://127.0.0.1:8080/compare?did=" + did + "&vid=" + vid;
+        })
+        layui.use(['form', 'layedit', 'laydate'], function(){
+            var form = layui.form
+                ,layer = layui.layer
+                ,layedit = layui.layedit
+                ,laydate = layui.laydate;
+
+            //日期
+            laydate.render({
+                elem: '#date'
+            });
+            laydate.render({
+                elem: '#date1'
+            });
+
+            //创建一个编辑器
+            var editIndex = layedit.build('LAY_demo_editor');
+
+            //自定义验证规则
+            form.verify({
+                title: function(value){
+                    if(value.length < 5){
+                        return '标题至少得5个字符啊';
+                    }
+                }
+                ,pass: [
+                    /^[\S]{6,12}$/
+                    ,'密码必须6到12位，且不能出现空格'
+                ]
+                ,content: function(value){
+                    layedit.sync(editIndex);
+                }
+            });
+
+            //监听指定开关
+            form.on('switch(switchTest)', function(data){
+                layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                    offset: '6px'
+                });
+                layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+            });
+
+            //监听提交
+            form.on('submit(demo1)', function(data){
+                layer.alert(JSON.stringify(data.field), {
+                    title: '最终的提交信息'
+                })
+                return false;
+            });
+
+            //表单赋值
+            layui.$('#LAY-component-form-setval').on('click', function(){
+                form.val('example', {
+                    "username": "贤心" // "name": "value"
+                    ,"password": "123456"
+                    ,"interest": 1
+                    ,"like[write]": true //复选框选中状态
+                    ,"close": true //开关状态
+                    ,"sex": "女"
+                    ,"desc": "我爱 layui"
+                });
+            });
+
+            //表单取值
+            layui.$('#LAY-component-form-getval').on('click', function(){
+                var data = form.val('example');
+                alert(JSON.stringify(data));
+            });
+
+        });
+    </script>
+</body>
+</html>

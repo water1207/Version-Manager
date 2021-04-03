@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hziee.dash.mapper.ReposMapper">
+    <select id="findById" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Repos">
+        select * from repositories where rid = #{rid}
+    </select>
+    <select id="findAllByUser" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Repos">
+        select * from repositories where uid = #{uid}
+    </select>
+    <insert id="addRepos" parameterType="cn.edu.hziee.dash.entity.Repos" useGeneratedKeys="true" keyProperty="rid" >
+        insert into repositories values(#{rid}, #{name}, #{uid}, #{time})
+    </insert>
+    <delete id="delRepos" parameterType="java.lang.Integer">
+        delete from repositories where rid = #{rid}
+    </delete>
+    <update id="editTime" parameterType="java.sql.Date">
+        update repositories set time = #{time} where rid = #{rid}
+    </update>
+</mapper>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <link rel="stylesheet" th:href="@{/main/css/homepage.css}"/>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <!--Editor.md-->
+    <link rel="stylesheet" th:href="@{/editormd/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/editormd/css/editormd.css}"/>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon"/>
+</head>
+<body>
+
+    <div class="top">
+
+        <div class="top1">
+            <a class="top1-img" href="/repos_list?uid=1">🐟</a>
+            <!--            <img class="top1-img" th:src="@{/main/image/dolphin.png}" alt="">-->
+            <a href="/repos_list?uid=1"><h3>语雀</h3></a>
+        </div>
+
+        <div class="top2">
+<!--            <div class="search-box">-->
+<!--                <input class="search-txt" type="text" name="" placeholder="Type to search">-->
+<!--                <a class="search-btn" href="#">-->
+<!--                    <i class="fa-search"><img th:src="@{/main/image/search.png}" alt=""></i>-->
+<!--                </a>-->
+<!--            </div>-->
+        </div>
+
+        <div class="top3">
+            <ul>
+                <b><li>工作台</li></b>
+                <li>小记</li>
+                <li>空间</li>
+                <li>发现</li>
+                <li>帮助</li>
+                <li>反馈</li>
+            </ul>
+        </div>
+
+        <div class="top4">
+            <div class="top4-message">
+                <img th:src="@{/main/image/铃铛.png}" alt="">
+            </div>
+            <div class="top4-img">
+                <img th:src="@{/main/image/user.jpg}" alt="">
+            </div>
+            <div class="top4-name"><p>admin</p></div>
+        </div>
+
+    </div>
+
+    <div class="container">
+
+        <div class="sidebar">
+            <img th:src="@{/main/image/manage.png}" alt="">
+            <p>版本管理</p>
+            <ul>
+                <li th:each="v:${vs}"><a th:text="${v.title}"></a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <form name="mdEditorForm" class="content-form">
+                <div align="center" style="color: whitesmoke">
+                   <input type="text" name="title" id="title" style="color: black" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                </div>
+                <input type="text" name="author" th:value="admin" th:type="hidden">
+                <input name="did" th:value="${did}" type="hidden">
+                <div id="article-content">
+                    <textarea name="content" id="content" style="display:none;" th:text="${version.content}"></textarea>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="bottom">
+        <div class="bottom-left">
+            <img class="bottom-img" th:src="@{/main/image/dolphin.png}" alt="">
+            <h4>&nbsp;&nbsp;语雀</h4>
+        </div>
+        <div class="bottom-right">
+            <ul>
+                <li>关于语雀</li>
+                <li>使用帮助</li>
+                <li>数据安全</li>
+                <li>服务协议</li>
+                <li>&nbsp;&nbsp;&nbsp;English</li>
+            </ul>
+        </div>
+    </div>
+
+<!--    <div class="search">-->
+<!--        <form action="">-->
+<!--            <div class="search-text"><input type="text" placeholder="请输入您要搜索的内容..."></div>-->
+<!--            <div class="search-submit"><input type="submit" value="搜索"></div>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    <div class="compare">-->
+<!--        <a href="/VersionComparison"><img th:src="@{/main/image/compare.png}" alt=""></a>-->
+<!--    </div>-->
+
+</body>
+
+<script th:src="@{/editormd/js/jquery.min.js}"></script>
+<script th:src="@{/editormd/js/editormd.min.js}"></script>
+
+<script type="text/javascript">
+
+    var testEditor;
+
+    //window.onload = function(){ }
+    $(function () {
+        testEditor = editormd("article-content", {
+            width: "100%",
+            height: "100%",
+            syncScrolling: "single",
+            path: "../editormd/lib/",
+            saveHTMLToTextarea: true,    // 保存 HTML 到 Textarea
+            emoji: true,
+            // theme: "dark",//工具栏主题
+            // previewTheme: "dark",//预览主题
+            // editorTheme: "pastel-on-dark",//编辑主题
+            tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart: true,             // 开启流程图支持，默认关闭
+            sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+            //图片上传
+            imageUpload: true,
+            imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+            imageUploadURL: "/file/upload",
+            onload: function () {
+                console.log('onload', this);
+            },
+            /*指定需要显示的功能按钮*/
+            toolbarIcons: function () {
+                return ["undo", "redo", "|",
+                    "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|",
+                    "h1", "h2", "h3", "h4", "h5", "h6", "|",
+                    "list-ul", "list-ol", "hr", "|",
+                    "link", "reference-link", "image", "code", "preformatted-text",
+                    "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
+                    "goto-line", "watch", "preview", "fullscreen", "clear", "search", "|",
+                    "help", "info", "releaseIcon"]
+            },
+
+            /*自定义功能按钮，下面我自定义了2个，一个是发布，一个是返回首页*/
+            toolbarIconTexts: {
+                releaseIcon: "<span bgcolor=\"gray\">发布</span>",
+                // index : "<span bgcolor=\"red\">返回首页</span>",
+            },
+
+            /*给自定义按钮指定回调函数*/
+            toolbarHandlers: {
+                releaseIcon: function (cm, icon, cursor, selection) {
+                    //表单提交
+                    mdEditorForm.method = "post";
+                    // mdEditorForm.action = "/article/addArticle";//提交至服务器的路径
+                    mdEditorForm.action = "/add";
+                    mdEditorForm.submit();
+                    //$("#title").show();
+                }
+                // index : function(){
+                //     window.location.href = '/index';
+                // },
+            }
+        });
+    });
+</script>
+</html>

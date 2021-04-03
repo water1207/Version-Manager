@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hziee.dash.mapper.VersionMapper">
+    <select id="findById" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Version">
+        select * from version where vid = #{vid}
+    </select>
+    <insert id="addVersion" parameterType="cn.edu.hziee.dash.entity.Version" useGeneratedKeys="true" keyProperty="vid">
+        insert into version values(#{vid}, #{title}, #{content}, #{author}, #{time})
+    </insert>
+    <insert id="linkDoc" parameterType="java.lang.Integer">
+        insert into doc_version values(#{did}, #{vid})
+    </insert>
+    <select id="findAllByDoc" parameterType="java.lang.Integer" resultType="cn.edu.hziee.dash.entity.Version">
+        select * from version where vid in (select vid from doc_version where did = #{did})
+    </select>
+</mapper>

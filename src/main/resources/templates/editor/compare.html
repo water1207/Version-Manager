@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <style type="text/css">
+        ins {
+            background-color: #cfc;
+            text-decoration: none;
+        }
+
+        del {
+            color: #999;
+            background-color: #FEC8C8;
+        }
+        .text {
+            float:left;
+            width: 30%;
+            border: 1px solid blue;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<h2>"HTML DIFF工具"Demo</h2>
+<div class="text">
+    <b>旧版本：</b>
+    <div id="version1" style="width: 80%">
+        <textarea id="v1" style="display:none;" placeholder="markdown" th:text="${v1.content}"></textarea>
+    </div>
+</div>
+<div class="text" style="border:1px solid red;">
+    <b>DIFF：</b>
+    <div id="compareT" style="width: 80%" class="markdown-body editormd-html-preview">
+        <!-- 比较结果 -->
+    </div>
+</div>
+<div class="text">
+    <b>新版本：</b>
+    <div id="version2" style="width: 80%">
+        <textarea id="v2" style="display:none;" placeholder="markdown" th:text="${v2.content}"></textarea>
+    </div>
+</div>
+<div>
+    <button id="diffBtn">对比</button></b>
+</div>
+
+<!--编辑器的js-->
+<link rel="stylesheet" th:href="@{/editormd/css/editormd.preview.css}" />
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mark.js/7.0.0/jquery.mark.min.js"></script>
+<script th:src="@{/editormd/lib/marked.min.js}"></script>
+<script th:src="@{/editormd/lib/prettify.min.js}"></script>
+<script th:src="@{/editormd/lib/raphael.min.js}"></script>
+<script th:src="@{/editormd/lib/underscore.min.js}"></script>
+<script th:src="@{/editormd/lib/sequence-diagram.min.js}"></script>
+<script th:src="@{/editormd/lib/flowchart.min.js}"></script>
+<script th:src="@{/editormd/lib/jquery.flowchart.min.js}"></script>
+<script th:src="@{/editormd/js/editormd.min.js}"></script>
+<!--文本比较的js-->
+<script type="text/javascript" src="js/htmldiff.js"></script>
+
+<script type="text/javascript">
+    var Editor1;               /* 解析md转html显示 */
+    var Editor2;
+    $(function () {
+        Editor1 = editormd.markdownToHTML("version1", {//注意：这里是上面DIV的id
+            htmlDecode: "style,script,iframe",
+            emoji: true,
+            taskList: true,
+            tocm: true,
+            tex: true, // 默认不解析
+            flowChart: true, // 默认不解析
+            sequenceDiagram: true, // 默认不解析
+            codeFold: true
+        });
+        Editor2 = editormd.markdownToHTML("version2", {//注意：这里是上面DIV的id
+            htmlDecode: "style,script,iframe",
+            emoji: true,
+            taskList: true,
+            tocm: true,
+            tex: true, // 默认不解析
+            flowChart: true, // 默认不解析
+            sequenceDiagram: true, // 默认不解析
+            codeFold: true
+        });
+    });
+
+    /* 差异比较 */
+    var diffBtn = document.getElementById("diffBtn");
+    var diff = document.getElementById('compareT');
+    diffBtn.onclick = function () {
+        diff.innerHTML = '<img style="margin-left:48%" src="http://img.t.sinajs.cn/t5/style/images/common/loading.gif">';
+        var oldT = document.getElementById('version1').innerHTML;
+        var newT = document.getElementById('version2').innerHTML;
+        // var oldT = $("#version1").html();
+        // var newT = $("#version2").html();
+        if(typeof Worker === "undefined"){
+            diff.innerHTML = getHTMLDiff(oldT, newT);
+        } else{
+            var worker = new Worker('js/htmldiff.js');
+            worker.postMessage({
+                'newVersion': newT,
+                'oldVersion': oldT
+            });
+            worker.onmessage = function (evt) {
+                diff.innerHTML = evt.data;
+            };
+        }
+    };
+</script>
+</body>
+</html>
